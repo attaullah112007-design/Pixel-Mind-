@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Mind - AI Chat</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    font-family: system-ui, -apple-system, sans-serif; 
+    background: #0b1120; 
+    color: #e2e8f0; 
+    height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+  }
+  header { 
+    padding: 12px 16px; 
+    background: #1e1b4b; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+    border-bottom: 1px solid #312e81;
+  }
+  header img { height: 40px; border-radius: 8px; }
+  header span { font-size: 20px; font-weight: bold; color: #c4b5fd; }
+  
+  #chat { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; line-height: 1.5; white-space: pre-wrap; font-size: 15px; }
+  .user { align-self: flex-end; background: #6d28d9; color: white; border-bottom-right-radius: 4px; }
+  .bot { align-self: flex-start; background: #1e293b; border-bottom-left-radius: 4px; border: 1px solid #334155; }
+  
+  form { display: flex; gap: 10px; padding: 16px; background: #0f172a; border-top: 1px solid #1e293b; }
+  input { flex: 1; padding: 14px; border-radius: 24px; border: 1px solid #334155; background: #1e293b; color: #fff; font-size: 16px; outline: none; }
+  input:focus { border-color: #8b5cf6; }
+  button { padding: 0 20px; border-radius: 24px; border: none; background: #8b5cf6; color: #fff; font-weight: bold; font-size: 16px; }
+  button:disabled { opacity: 0.5; }
+</style>
+</head>
+<body>
+<header>
+  <span>Pixel Mind</span>
+</header>
+<div id="chat">
+  <div class="msg bot">Assalam o Alaikum! Main Pixel Mind hoon. Aap kaise hain?</div>
+</div>
+<form id="form">
+  <input id="input" placeholder="Apna sawal likhein..." autocomplete="off" required>
+  <button id="send" type="submit">➤</button>
+</form>
+<script>
+const API_KEY = "YAHAN_APNI_GEMINI_KEY_DALEIN";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+const chat = document.getElementById('chat');
+const form = document.getElementById('form');
+const input = document.getElementById('input');
+const send = document.getElementById('send');
+let history = [];
+
+function addMsg(text, who) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const text = input.value.trim();
+  if (!text) return;
+  addMsg(text, 'user');
+  input.value = '';
+  send.disabled = true;
+  const botDiv = addMsg('Soch raha hoon...', 'bot');
+  history.push({ role: "user", parts: [{ text }] });
+  
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: history })
+    });
+    const data = await res.json();
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Maazrat, jawab nahi mila.';
+    botDiv.textContent = reply;
+    history.push({ role: "model", parts: [{ text: reply }] });
+  } catch (err) {
+    botDiv.textContent = 'Error: Internet check karein.';
+  }
+  send.disabled = false;
+  input.focus();
+});
+</script>
+</body>
+</html>
