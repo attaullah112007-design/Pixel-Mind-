@@ -49,7 +49,7 @@
   <button id="send" type="submit">➤</button>
 </form>
 <script>
-const API_KEY = "YAHAN_APNI_KEY_DALEIN"; // <--- یہاں اپنی نئی والی Key لگائیں (ڈبل کوٹ کے اندر)
+const API_KEY = "AQ.Ab8RN6ItaAXFxAtRBt4CvFvyLh2F3IGEiGzB67dYCCV0LnzeBg";
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
 
 const chat = document.getElementById('chat');
@@ -87,7 +87,6 @@ form.addEventListener('submit', async (e) => {
     
     const data = await res.json();
     
-    // اصل ایرر چیک کرنے کے لیے
     if (data.error) {
         botDiv.textContent = "Google Error: " + data.error.message;
     } else {
