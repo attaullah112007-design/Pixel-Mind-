@@ -49,8 +49,9 @@
   <button id="send" type="submit">➤</button>
 </form>
 <script>
-const API_KEY = "AQ.Ab8RN6LWAMc3bvfe_I372STUrFyLsKzic_kmmUOKdi8vOEcRmA";
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+const API_KEY = "YAHAN_APNI_KEY_DALEIN"; // <--- یہاں اپنی نئی والی Key لگائیں (ڈبل کوٹ کے اندر)
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+
 const chat = document.getElementById('chat');
 const form = document.getElementById('form');
 const input = document.getElementById('input');
@@ -70,6 +71,7 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const text = input.value.trim();
   if (!text) return;
+  
   addMsg(text, 'user');
   input.value = '';
   send.disabled = true;
@@ -82,13 +84,21 @@ form.addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: history })
     });
+    
     const data = await res.json();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Maazrat, jawab nahi mila.';
-    botDiv.textContent = reply;
-    history.push({ role: "model", parts: [{ text: reply }] });
+    
+    // اصل ایرر چیک کرنے کے لیے
+    if (data.error) {
+        botDiv.textContent = "Google Error: " + data.error.message;
+    } else {
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Maazrat, jawab nahi mila.';
+        botDiv.textContent = reply;
+        history.push({ role: "model", parts: [{ text: reply }] });
+    }
   } catch (err) {
-  botDiv.textContent = 'Error: ' + err.message;
+    botDiv.textContent = 'Network Error: ' + err.message;
   }
+  
   send.disabled = false;
   input.focus();
 });
