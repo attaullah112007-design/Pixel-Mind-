@@ -87,7 +87,7 @@ form.addEventListener('submit', async (e) => {
     botDiv.textContent = reply;
     history.push({ role: "model", parts: [{ text: reply }] });
   } catch (err) {
-    botDiv.textContent = 'Error: Internet check karein.';
+  botDiv.textContent = 'Error: ' + err.message;
   }
   send.disabled = false;
   input.focus();
